@@ -8,7 +8,7 @@ library(igraph)
 library(dplyr)
 library(fable)
 
-source(file="Functions_For_Cluster.R")
+source(file="Functions.R")
 
 
 sequ <- seq(0.1, 0.9, by = 0.1)
@@ -58,23 +58,7 @@ for(ll in 1:5){
                             conf_level2 = 55,
                             weights_opt = 4,
                             h = time_step)
-    eval1 <- eval_metrics2(graphlist[[(tt+time_step)]], grpred$graph_mean)
-    evaldf <- eval1 %>%
-      as.data.frame() %>%
-      mutate(pred_nodes = vcount(grpred$graph_mean),
-             actual_nodes = vcount(graphlist[[(tt+time_step)]]),
-             pred_edges = ecount(grpred$graph_mean),
-             actual_edges = ecount(graphlist[[(tt+time_step)]]),
-             time_step = time_step,
-             graphs_in_training = tt
-      ) %>%
-      relocate(actual_nodes, pred_nodes, actual_edges, pred_edges)
-    if((ll == 1) & (h == 1)){
-      evaldf_all <- evaldf
-    }else{
-      evaldf_all <- bind_rows(evaldf_all, evaldf)
-    }
-
+ 
     eval0 <- eval_metrics(graphlist[[(tt+time_step)]], grpred$graph_mean)
     evaldf0 <- eval0 %>%
       as.data.frame() %>%
@@ -96,11 +80,8 @@ for(ll in 1:5){
 
 }
 
-# Reordered adjacency matrix
-filename <- paste("Data_Output/Tests_01/Evaluation_Metrics_2_del_edge_", del_edge_val, "_new_nodes_", new_nodes_val, "_edge_increase_", edge_increase_val, "_row_num_", args[1], ".csv", sep="" )
-write.csv(evaldf_all, filename, row.names = FALSE)
 
-# Original adjacency matrix
-filename <- paste("Data_Output/Tests_01/Evaluation_Metrics_1_del_edge_", del_edge_val, "_new_nodes_", new_nodes_val, "_edge_increase_", edge_increase_val, "_row_num_", args[1], ".csv", sep="" )
+# Save evaluation metrics
+filename <- paste("Data_Output/Synthetic/Evaluation_Metrics_del_edge_", del_edge_val, "_new_nodes_", new_nodes_val, "_edge_increase_", edge_increase_val, "_row_num_", args[1], ".csv", sep="" )
 write.csv(evaldf_all0, filename, row.names = FALSE)
 
